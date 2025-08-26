@@ -1,4 +1,4 @@
-// app/components/FeatureImage.js
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function FeatureImage({ title, image, prevFeature, nextFeature }) {
@@ -12,7 +12,7 @@ export default function FeatureImage({ title, image, prevFeature, nextFeature })
         />
       </div>
 
-      {/* Arrows with blue separator */}
+      
       <div className="flex items-center gap-3 mt-4">
         <button
           onClick={prevFeature}

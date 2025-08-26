@@ -1,4 +1,4 @@
-// app/features.js
+
 export const features = [
   {
     title: "Smart Appointment & OPD Dashboard",

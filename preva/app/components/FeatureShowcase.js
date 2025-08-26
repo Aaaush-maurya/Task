@@ -28,19 +28,19 @@ export default function FeatureShowcase() {
       }, 500);
 
       if (e.deltaY > 0) {
-        // Scrolling down - go to next feature
+       
         if (index < features.length - 1) {
           e.preventDefault();
           setIndex(index + 1);
         }
-        // If at last feature, do nothing (allow normal page scrolling)
+        
       } else {
-        // Scrolling up - go to previous feature
+       
         if (index > 0) {
           e.preventDefault();
           setIndex(index - 1);
         }
-        // If at first feature, do nothing (allow normal page scrolling)
+       
       }
     };
 
@@ -70,12 +70,12 @@ export default function FeatureShowcase() {
           />
         </div>
 
-        {/* Left - Feature Content (positioned absolutely over center) */}
+        {/* Left - Feature Content  */}
         <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1/3">
           <FeatureContent index={index} title={title} description={description} />
         </div>
 
-        {/* Right - Feature List (positioned absolutely over center) */}
+        {/* Right - Feature List  */}
         <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/3">
           <h3 className="text-base md:text-lg font-semibold mb-4">Feature Showcase</h3>
           <FeatureList features={features} index={index} setIndex={setIndex} />

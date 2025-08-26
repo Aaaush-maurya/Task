@@ -1,4 +1,4 @@
-// app/components/FeatureContent.js
+
 export default function FeatureContent({ index, title, description }) {
   return (
     <div className="flex flex-col">

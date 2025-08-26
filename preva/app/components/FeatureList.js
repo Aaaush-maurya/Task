@@ -1,4 +1,4 @@
-// app/components/FeatureList.js
+
 export default function FeatureList({ features, index, setIndex }) {
   return (
     <div className="flex flex-col gap-4">
