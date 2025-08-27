@@ -17,7 +17,7 @@ export default function FeatureShowcase() {
   const nextFeature = () =>
     setIndex((prev) => (prev === features.length - 1 ? 0 : prev + 1));
 
-  useEffect(() => {
+    useEffect(() => {
     const container = containerRef.current;
 
     const handleWheel = (e) => {
@@ -27,28 +27,69 @@ export default function FeatureShowcase() {
         scrollTimeout.current = null;
       }, 500);
 
-      if (e.deltaY > 0) {
-       
-        if (index < features.length - 1) {
-          e.preventDefault();
+      // Check if we can navigate to another feature
+      const canGoNext = index < features.length - 1;
+      const canGoPrev = index > 0;
+
+      if (e.deltaY > 0 && canGoNext) {
+        // Scrolling down and can go to next feature
+        e.preventDefault();
+        setIndex(index + 1);
+      } else if (e.deltaY < 0 && canGoPrev) {
+        // Scrolling up and can go to previous feature
+        e.preventDefault();
+        setIndex(index - 1);
+      }
+      // If we can't navigate in that direction, do nothing (allow normal page scrolling)
+    };
+
+    // Touch/swipe support for mobile
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    const handleTouchStart = (e) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e) => {
+      e.preventDefault(); // Prevent default touch scrolling
+    };
+
+    const handleTouchEnd = (e) => {
+      touchEndY = e.changedTouches[0].clientY;
+      const swipeDistance = touchStartY - touchEndY;
+      const minSwipeDistance = 50; // Minimum distance for a swipe
+
+      if (Math.abs(swipeDistance) > minSwipeDistance) {
+        if (scrollTimeout.current) return;
+
+        scrollTimeout.current = setTimeout(() => {
+          scrollTimeout.current = null;
+        }, 500);
+
+        if (swipeDistance > 0 && index < features.length - 1) {
+          // Swipe up - go to next feature
           setIndex(index + 1);
-        }
-        
-      } else {
-       
-        if (index > 0) {
-          e.preventDefault();
+        } else if (swipeDistance < 0 && index > 0) {
+          // Swipe down - go to previous feature
           setIndex(index - 1);
         }
-       
       }
     };
 
     container.style.overflow = "hidden";
     window.addEventListener("wheel", handleWheel, { passive: false });
+    
+    // Add touch event listeners
+    container.addEventListener("touchstart", handleTouchStart, { passive: false });
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("touchend", handleTouchEnd, { passive: false });
 
     return () => {
       window.removeEventListener("wheel", handleWheel);
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("touchend", handleTouchEnd);
       container.style.overflow = "auto";
     };
   }, [index]);
