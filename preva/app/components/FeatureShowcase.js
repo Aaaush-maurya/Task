@@ -23,9 +23,12 @@ export default function FeatureShowcase() {
     const handleWheel = (e) => {
       if (scrollTimeout.current) return;
 
+      // Always prevent default scrolling when in feature section
+      e.preventDefault();
+
       scrollTimeout.current = setTimeout(() => {
         scrollTimeout.current = null;
-      }, 500);
+      }, 200);
 
       // Check if we can navigate to another feature
       const canGoNext = index < features.length - 1;
@@ -33,40 +36,47 @@ export default function FeatureShowcase() {
 
       if (e.deltaY > 0 && canGoNext) {
         // Scrolling down and can go to next feature
-        e.preventDefault();
         setIndex(index + 1);
       } else if (e.deltaY < 0 && canGoPrev) {
-        // Scrolling up and can go to previous feature
-        e.preventDefault();
+        // Scrolling up and go to previous feature
         setIndex(index - 1);
       }
-      // If we can't navigate in that direction, do nothing (allow normal page scrolling)
+      // If we can't navigate in that direction, still prevent page scrolling
     };
 
     // Touch/swipe support for mobile
     let touchStartY = 0;
     let touchEndY = 0;
+    let isSwiping = false;
 
     const handleTouchStart = (e) => {
       touchStartY = e.touches[0].clientY;
+      isSwiping = false;
     };
 
     const handleTouchMove = (e) => {
-      e.preventDefault(); // Prevent default touch scrolling
+      // Always prevent default touch scrolling when in feature section
+      e.preventDefault();
+      
+      if (Math.abs(e.touches[0].clientY - touchStartY) > 10) {
+        isSwiping = true;
+      }
     };
 
     const handleTouchEnd = (e) => {
+      if (!isSwiping) return;
+      
+      if (scrollTimeout.current) return;
+
+      scrollTimeout.current = setTimeout(() => {
+        scrollTimeout.current = null;
+      }, 200); // Same timeout as wheel events
+      
       touchEndY = e.changedTouches[0].clientY;
       const swipeDistance = touchStartY - touchEndY;
-      const minSwipeDistance = 50; // Minimum distance for a swipe
+      const minSwipeDistance = 30; // Reduced minimum distance for better responsiveness
 
       if (Math.abs(swipeDistance) > minSwipeDistance) {
-        if (scrollTimeout.current) return;
-
-        scrollTimeout.current = setTimeout(() => {
-          scrollTimeout.current = null;
-        }, 500);
-
         if (swipeDistance > 0 && index < features.length - 1) {
           // Swipe up - go to next feature
           setIndex(index + 1);
