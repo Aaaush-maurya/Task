@@ -27,22 +27,23 @@ export default function FeatureShowcase() {
       const canGoNext = index < features.length - 1;
       const canGoPrev = index > 0;
 
-      if (e.deltaY > 0 && canGoNext) {
-        // Scrolling down and can go to next feature
+      // Only prevent default if we're actually going to navigate
+      if ((e.deltaY > 0 && canGoNext) || (e.deltaY < 0 && canGoPrev)) {
         e.preventDefault();
-        setIndex(index + 1);
-        scrollTimeout.current = setTimeout(() => {
-          scrollTimeout.current = null;
-        }, 200);
-      } else if (e.deltaY < 0 && canGoPrev) {
-        // Scrolling up and go to previous feature
-        e.preventDefault();
-        setIndex(index - 1);
+        
+        if (e.deltaY > 0) {
+          // Scrolling down and can go to next feature
+          setIndex(index + 1);
+        } else {
+          // Scrolling up and can go to previous feature
+          setIndex(index - 1);
+        }
+        
         scrollTimeout.current = setTimeout(() => {
           scrollTimeout.current = null;
         }, 200);
       }
-      // If we can't navigate in that direction, allow normal page scrolling
+      // If we can't navigate in that direction, do nothing (allow normal page scrolling)
     };
 
     // Touch/swipe support for mobile
@@ -66,22 +67,30 @@ export default function FeatureShowcase() {
       
       if (scrollTimeout.current) return;
 
-      scrollTimeout.current = setTimeout(() => {
-        scrollTimeout.current = null;
-      }, 200); // Same timeout as wheel events
-      
       touchEndY = e.changedTouches[0].clientY;
       const swipeDistance = touchStartY - touchEndY;
       const minSwipeDistance = 30; // Reduced minimum distance for better responsiveness
 
+      // Check if we can navigate to another feature
+      const canGoNext = index < features.length - 1;
+      const canGoPrev = index > 0;
+
+      // Only navigate if we can go in that direction
       if (Math.abs(swipeDistance) > minSwipeDistance) {
-        if (swipeDistance > 0 && index < features.length - 1) {
+        if (swipeDistance > 0 && canGoNext) {
           // Swipe up - go to next feature
           setIndex(index + 1);
-        } else if (swipeDistance < 0 && index > 0) {
+          scrollTimeout.current = setTimeout(() => {
+            scrollTimeout.current = null;
+          }, 200);
+        } else if (swipeDistance < 0 && canGoPrev) {
           // Swipe down - go to previous feature
           setIndex(index - 1);
+          scrollTimeout.current = setTimeout(() => {
+            scrollTimeout.current = null;
+          }, 200);
         }
+        // If we can't navigate in that direction, do nothing (allow normal page scrolling)
       }
     };
 
