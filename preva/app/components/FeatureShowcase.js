@@ -60,25 +60,52 @@ export default function FeatureShowcase() {
       style={{ overflow: "hidden" }}
     >
       <div className="relative max-w-7xl w-full">
-        {/* Center - Feature Image with buttons */}
-        <div className="flex flex-col items-center justify-center">
-          <FeatureImage
-            title={title}
-            image={image}
-            prevFeature={prevFeature}
-            nextFeature={nextFeature}
-          />
+        {/* Mobile Layout: Feature Content First, then Image */}
+        <div className="md:hidden flex flex-col">
+          {/* Feature Content - Mobile: First */}
+          <div className="px-4 mb-8">
+            <FeatureContent index={index} title={title} description={description} />
+          </div>
+          
+          {/* Feature Image - Mobile: Second */}
+          <div className="flex flex-col items-center justify-center">
+            <FeatureImage
+              title={title}
+              image={image}
+              prevFeature={prevFeature}
+              nextFeature={nextFeature}
+            />
+          </div>
+          
+          {/* Feature List - Mobile: Third */}
+          <div className="px-4 mt-8">
+            <h3 className="text-base font-semibold mb-4">Feature Showcase</h3>
+            <FeatureList features={features} index={index} setIndex={setIndex} />
+          </div>
         </div>
 
-        {/* Left - Feature Content  */}
-        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1/3">
-          <FeatureContent index={index} title={title} description={description} />
-        </div>
+        {/* Desktop Layout: Image Center, Content Left/Right */}
+        <div className="hidden md:block">
+          {/* Center - Feature Image with buttons */}
+          <div className="flex flex-col items-center justify-center">
+            <FeatureImage
+              title={title}
+              image={image}
+              prevFeature={prevFeature}
+              nextFeature={nextFeature}
+            />
+          </div>
 
-        {/* Right - Feature List  */}
-        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/3">
-          <h3 className="text-base md:text-lg font-semibold mb-4">Feature Showcase</h3>
-          <FeatureList features={features} index={index} setIndex={setIndex} />
+          {/* Left - Feature Content */}
+          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1/3">
+            <FeatureContent index={index} title={title} description={description} />
+          </div>
+
+          {/* Right - Feature List */}
+          <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/3">
+            <h3 className="text-base md:text-lg font-semibold mb-4">Feature Showcase</h3>
+            <FeatureList features={features} index={index} setIndex={setIndex} />
+          </div>
         </div>
       </div>
     </div>
