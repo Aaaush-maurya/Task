@@ -8,6 +8,7 @@ import FeatureList from "./FeatureList";
 
 export default function FeatureShowcase() {
   const [index, setIndex] = useState(0);
+  const { title, description, image } = features[index];
   const containerRef = useRef(null);
   const scrollTimeout = useRef(null);
 
@@ -16,72 +17,118 @@ export default function FeatureShowcase() {
   const nextFeature = () =>
     setIndex((prev) => (prev === features.length - 1 ? 0 : prev + 1));
 
-  useEffect(() => {
+    useEffect(() => {
     const container = containerRef.current;
 
     const handleWheel = (e) => {
       if (scrollTimeout.current) return;
+
+      // Always prevent default scrolling when in feature section
       e.preventDefault();
 
       scrollTimeout.current = setTimeout(() => {
         scrollTimeout.current = null;
-      }, 300); // Slightly longer for smoother UX
+      }, 200);
 
-      if (e.deltaY > 0) nextFeature();
-      else if (e.deltaY < 0) prevFeature();
+      // Check if we can navigate to another feature
+      const canGoNext = index < features.length - 1;
+      const canGoPrev = index > 0;
+
+      if (e.deltaY > 0 && canGoNext) {
+        // Scrolling down and can go to next feature
+        setIndex(index + 1);
+      } else if (e.deltaY < 0 && canGoPrev) {
+        // Scrolling up and go to previous feature
+        setIndex(index - 1);
+      }
+      // If we can't navigate in that direction, still prevent page scrolling
     };
 
+    // Touch/swipe support for mobile
     let touchStartY = 0;
     let touchEndY = 0;
+    let isSwiping = false;
 
     const handleTouchStart = (e) => {
       touchStartY = e.touches[0].clientY;
+      isSwiping = false;
+    };
+
+    const handleTouchMove = (e) => {
+      // Always prevent default touch scrolling when in feature section
+      e.preventDefault();
+      
+      if (Math.abs(e.touches[0].clientY - touchStartY) > 10) {
+        isSwiping = true;
+      }
     };
 
     const handleTouchEnd = (e) => {
-      touchEndY = e.changedTouches[0].clientY;
-      const swipeDistance = touchStartY - touchEndY;
-
+      if (!isSwiping) return;
+      
       if (scrollTimeout.current) return;
+
       scrollTimeout.current = setTimeout(() => {
         scrollTimeout.current = null;
-      }, 300);
+      }, 200); // Same timeout as wheel events
+      
+      touchEndY = e.changedTouches[0].clientY;
+      const swipeDistance = touchStartY - touchEndY;
+      const minSwipeDistance = 30; // Reduced minimum distance for better responsiveness
 
-      if (swipeDistance > 30) nextFeature();
-      else if (swipeDistance < -30) prevFeature();
+      if (Math.abs(swipeDistance) > minSwipeDistance) {
+        if (swipeDistance > 0 && index < features.length - 1) {
+          // Swipe up - go to next feature
+          setIndex(index + 1);
+        } else if (swipeDistance < 0 && index > 0) {
+          // Swipe down - go to previous feature
+          setIndex(index - 1);
+        }
+      }
     };
 
     const handleKeyDown = (e) => {
-      if (e.key === "ArrowRight") nextFeature();
-      if (e.key === "ArrowLeft") prevFeature();
-    };
+  if (e.key === "ArrowRight") nextFeature();
+  if (e.key === "ArrowLeft") prevFeature();
+};
 
-    container.addEventListener("wheel", handleWheel, { passive: false });
+
+    container.style.overflow = "hidden";
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    
+    // Add touch event listeners
     container.addEventListener("touchstart", handleTouchStart, { passive: false });
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
     container.addEventListener("touchend", handleTouchEnd, { passive: false });
     window.addEventListener("keydown", handleKeyDown);
 
+
     return () => {
-      container.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("wheel", handleWheel);
       container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
       container.removeEventListener("touchend", handleTouchEnd);
       window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
 
-  const { title, description, image } = features[index];
+      container.style.overflow = "auto";
+    };
+  }, [index]);
 
   return (
     <div
       ref={containerRef}
-      className="min-h-screen flex items-center justify-center bg-white p-6 overflow-hidden"
+      className="min-h-screen flex items-center justify-center bg-white p-6"
+      style={{ overflow: "hidden" }}
     >
-      <div className="relative max-w-7xl w-full transition-opacity duration-500 ease-in-out">
-        {/* Mobile Layout */}
+      <div className="relative max-w-7xl w-full">
+        {/* Mobile Layout: Feature Content First, then Image */}
         <div className="md:hidden flex flex-col">
+          {/* Feature Content - Mobile: First */}
           <div className="px-4 mb-8">
             <FeatureContent index={index} title={title} description={description} />
           </div>
+          
+          {/* Feature Image - Mobile: Second */}
           <div className="flex flex-col items-center justify-center">
             <FeatureImage
               title={title}
@@ -92,8 +139,9 @@ export default function FeatureShowcase() {
           </div>
         </div>
 
-        {/* Desktop Layout */}
+        {/* Desktop Layout: Image Center, Content Left/Right */}
         <div className="hidden md:block">
+          {/* Center - Feature Image with buttons */}
           <div className="flex flex-col items-center justify-center">
             <FeatureImage
               title={title}
@@ -102,9 +150,13 @@ export default function FeatureShowcase() {
               nextFeature={nextFeature}
             />
           </div>
+
+          {/* Left - Feature Content */}
           <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1/3">
             <FeatureContent index={index} title={title} description={description} />
           </div>
+
+          {/* Right - Feature List */}
           <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/3">
             <h3 className="text-base md:text-lg font-semibold mb-4">Feature Showcase</h3>
             <FeatureList features={features} index={index} setIndex={setIndex} />
