@@ -23,25 +23,26 @@ export default function FeatureShowcase() {
     const handleWheel = (e) => {
       if (scrollTimeout.current) return;
 
-      // Always prevent default scrolling when in feature section
-      e.preventDefault();
-
-      scrollTimeout.current = setTimeout(() => {
-        scrollTimeout.current = null;
-      }, 200);
-
       // Check if we can navigate to another feature
       const canGoNext = index < features.length - 1;
       const canGoPrev = index > 0;
 
       if (e.deltaY > 0 && canGoNext) {
         // Scrolling down and can go to next feature
+        e.preventDefault();
         setIndex(index + 1);
+        scrollTimeout.current = setTimeout(() => {
+          scrollTimeout.current = null;
+        }, 200);
       } else if (e.deltaY < 0 && canGoPrev) {
         // Scrolling up and go to previous feature
+        e.preventDefault();
         setIndex(index - 1);
+        scrollTimeout.current = setTimeout(() => {
+          scrollTimeout.current = null;
+        }, 200);
       }
-      // If we can't navigate in that direction, still prevent page scrolling
+      // If we can't navigate in that direction, allow normal page scrolling
     };
 
     // Touch/swipe support for mobile
@@ -55,9 +56,6 @@ export default function FeatureShowcase() {
     };
 
     const handleTouchMove = (e) => {
-      // Always prevent default touch scrolling when in feature section
-      e.preventDefault();
-      
       if (Math.abs(e.touches[0].clientY - touchStartY) > 10) {
         isSwiping = true;
       }
