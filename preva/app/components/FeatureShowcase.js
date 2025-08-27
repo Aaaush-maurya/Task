@@ -77,11 +77,7 @@ export default function FeatureShowcase() {
             />
           </div>
           
-          {/* Feature List - Mobile: Third */}
-          <div className="px-4 mt-8">
-            <h3 className="text-base font-semibold mb-4">Feature Showcase</h3>
-            <FeatureList features={features} index={index} setIndex={setIndex} />
-          </div>
+
         </div>
 
         {/* Desktop Layout: Image Center, Content Left/Right */}
