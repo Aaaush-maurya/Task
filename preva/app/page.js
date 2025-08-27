@@ -7,9 +7,6 @@ export default function Page() {
         <FeatureShowcase />
       </div>
 
-      <footer className="bg-gray-100 text-center py-4 text-gray-700 font-semibold">
-        preva.care
-      </footer>
     </div>
   );
 }
